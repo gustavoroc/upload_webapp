@@ -4,3 +4,6 @@ This project is supposed to answer my questions about downloading and uploading 
 - Technologies used : 
   - Node JS;
   - Vue
+  - Bulma;
+  - Express;
+  
