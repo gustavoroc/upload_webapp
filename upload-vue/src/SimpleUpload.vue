@@ -37,12 +37,14 @@
             </div>
 
         </div>
-        
-        <div class="field">
-            <button class="button is-info">Send</button>
-        </div>
 
+            <div class="field">
+                <button class="button is-info">Send</button>
+            </div>
     </form>
+            <div class="field m-5" >
+                <button class="button is-info" @click.prevent="downloadFile">Download</button>
+            </div>
 </template>
 
 
@@ -55,7 +57,8 @@ export default {
         return {
             file: '', //Type of File.
             message: '',
-            error: false
+            error: false,
+            data: ""
         }
     },
 
@@ -70,14 +73,28 @@ export default {
             const formData = new FormData(); // The format for files upload.
             formData.append("file", this.file);
             try {
-                await axios.post("/upload", formData);
+                const data = await axios.post("/upload", formData);
                 this.message = "File has been uploaded";
                 this.file = "";
                 this.error = false;
+                this.data = data.data.file;
+                console.log(this.data.filename);
+
             } catch(err) {
                 this.message = "something went wrong";
                 this.error = true;
             }
+        },
+
+        async downloadFile() {
+            const data = await axios.get(`/download/${this.data.filename}`, { responseType: 'blob' });
+            console.log(data);
+            const fileURL = window.URL.createObjectURL(new Blob([data.data]));
+            let fileLink = document.createElement('a');
+            fileLink.href = fileURL;
+            fileLink.setAttribute('download', this.data.filename)
+            document.body.appendChild(fileLink)
+            fileLink.click();
         }
     }
 }
