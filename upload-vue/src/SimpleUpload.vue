@@ -1,6 +1,13 @@
 <template>
     <form @submit.prevent="sendFile" enctype="multipart/form-data">
 
+        <div
+         v-if="message"
+         :class="`message ${error ? 'is-danger' : 'is-success'}`"
+        >
+            <div class="message-body">{{message}}</div>
+        </div>
+
         <div class="field">
 
             <div class="file is-boxed is-primary">
@@ -46,13 +53,17 @@ export default {
 
     data() {
         return {
-            file: '' //Type of File.
+            file: '', //Type of File.
+            message: '',
+            error: false
         }
     },
 
     methods: {
         selectFile() {
             this.file = this.$refs.file.files[0]; // this.$refs.file => The dom's element;
+            this.error = false;
+            this.message = "";
         },
 
         async sendFile() {
@@ -60,8 +71,12 @@ export default {
             formData.append("file", this.file);
             try {
                 await axios.post("/upload", formData);
+                this.message = "File has been uploaded";
+                this.file = "";
+                this.error = false;
             } catch(err) {
-                console.log(err);
+                this.message = "something went wrong";
+                this.error = true;
             }
         }
     }
